@@ -3,7 +3,10 @@ package request
 import (
 	"github.com/flipped-aurora/gin-vue-admin/server/model/common/request"
 	{{ if or .HasSearchTimer .GvaModel}}"time"{{ end }}
+<<<<<<< HEAD
 	{{ if .NeedJSON }}"gorm.io/datatypes"{{ end }}
+=======
+>>>>>>> upstream/main
 )
 
 type {{.StructName}}Search struct{
@@ -23,10 +26,13 @@ type {{.StructName}}Search struct{
                       {{.FieldName}}  string `json:"{{.FieldJson}}" form:"{{.FieldJson}}" `
                             {{- else if eq .FieldType "video" }}
                       {{.FieldName}}  string `json:"{{.FieldJson}}" form:"{{.FieldJson}}" `
+<<<<<<< HEAD
                              {{- else if eq .FieldType "file" }}
                       {{.FieldName}}  datatypes.JSON `json:"{{.FieldJson}}" form:"{{.FieldJson}}" `
                             {{- else if eq .FieldType "pictures" }}
                       {{.FieldName}}  datatypes.JSON `json:"{{.FieldJson}}" form:"{{.FieldJson}}" `
+=======
+>>>>>>> upstream/main
                             {{- else if eq .FieldType "richtext" }}
                       {{.FieldName}}  string `json:"{{.FieldJson}}" form:"{{.FieldJson}}" `
                             {{- else if ne .FieldType "string" }}

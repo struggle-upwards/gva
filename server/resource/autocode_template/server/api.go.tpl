@@ -133,7 +133,11 @@ func ({{.Abbreviation}}Api *{{.StructName}}Api) Find{{.StructName}}(c *gin.Conte
         global.GVA_LOG.Error("查询失败!", zap.Error(err))
 		response.FailWithMessage("查询失败", c)
 	} else {
+<<<<<<< HEAD
 		response.OkWithData(gin.H{"re{{.Abbreviation}}": re{{.Abbreviation}}}, c)
+=======
+		response.OkWithData(re{{.Abbreviation}}, c)
+>>>>>>> upstream/main
 	}
 }
 

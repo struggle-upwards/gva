@@ -296,14 +296,14 @@
           <el-form-item>
             <template #label>
               <el-tooltip
-                content="注：自动迁移生成的文件到yaml配置的对应位置"
-                placement="bottom"
-                effect="light"
+                  content="注：自动同步数据库表结构，如果不需要可以选择关闭。"
+                  placement="bottom"
+                  effect="light"
               >
-                <div> 自动移动文件 <el-icon><QuestionFilled /></el-icon></div>
+                <div> 同步表结构 <el-icon><QuestionFilled /></el-icon></div>
               </el-tooltip>
             </template>
-            <el-checkbox v-model="form.autoMoveFile" />
+            <el-checkbox v-model="form.autoMigrate" />
           </el-form-item>
         </div>
       </el-form>
@@ -433,6 +433,28 @@
             </template>
           </el-table-column>
           <el-table-column
+              align="left"
+              prop="fieldIndexType"
+              label="索引类型"
+              width="160"
+          >
+            <template #default="{row}">
+              <el-select
+                  v-model="row.fieldIndexType"
+                  style="width:100%"
+                  placeholder="请选择字段索引类型"
+                  clearable
+              >
+                <el-option
+                    v-for="item in typeIndexOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                />
+              </el-select>
+            </template>
+          </el-table-column>
+          <el-table-column
             align="left"
             prop="dataTypeLong"
             label="数据库字段长度"
@@ -551,6 +573,7 @@
         :dialog-middle="dialogMiddle"
         :type-options="typeOptions"
         :type-search-options="typeSearchOptions"
+        :type-index-options="typeIndexOptions"
       />
 
     </el-drawer>
@@ -711,6 +734,17 @@ const typeSearchOptions = ref([
   }
 ])
 
+const typeIndexOptions = ref([
+  {
+    label: 'index',
+    value: 'index'
+  },
+  {
+    label: 'uniqueIndex',
+    value: 'uniqueIndex'
+  }
+])
+
 const fieldTemplate = {
   fieldName: '',
   fieldDesc: '',
@@ -728,6 +762,7 @@ const fieldTemplate = {
   primaryKey: false,
   clearable: true,
   fieldSearchType: '',
+  fieldIndexType: '',
   dictType: '',
   dataSource: {
     association:1,
@@ -758,7 +793,7 @@ const form = ref({
   businessDB: '',
   autoCreateApiToSql: true,
   autoCreateMenuToSql: true,
-  autoMoveFile: true,
+  autoMigrate: true,
   gvaModel: true,
   autoCreateResource: false,
   fields: []
@@ -935,38 +970,12 @@ const enterForm = async(isPreview) => {
         if (data.headers?.success === 'false') {
           return
         }
-        if (form.value.autoMoveFile) {
           ElMessage({
             type: 'success',
             message: '自动化代码创建成功，自动移动成功'
           })
-          return
-        }
-        ElMessage({
-          type: 'success',
-          message: '自动化代码创建成功，正在下载'
-        })
-        const blob = new Blob([data])
-        const fileName = 'ginvueadmin.zip'
-        if ('download' in document.createElement('a')) {
-          // 不是IE浏览器
-          const url = window.URL.createObjectURL(blob)
-          const link = document.createElement('a')
-          link.style.display = 'none'
-          link.href = url
-          link.setAttribute('download', fileName)
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link) // 下载完成移除元素
-          window.URL.revokeObjectURL(url) // 释放掉blob对象
-        } else {
-          // IE 10+
-          window.navigator.msSaveBlob(blob, fileName)
-        }
         clearCatch()
       }
-    } else {
-      return false
     }
   })
 }
@@ -1007,7 +1016,6 @@ const getColumnFunc = async() => {
     form.value.abbreviation = tbHump
     form.value.description = tbHump + '表'
     form.value.autoCreateApiToSql = true
-    form.value.autoMoveFile = true
     form.value.fields = []
     res.data.columns &&
           res.data.columns.forEach(item => {
@@ -1027,6 +1035,7 @@ const getColumnFunc = async() => {
                 errorText: '',
                 clearable: true,
                 fieldSearchType: '',
+                fieldIndexType: '',
                 dictType: '',
                 front: true,
                 dataSource: {
@@ -1120,7 +1129,7 @@ const clearCatch = async () => {
     businessDB: '',
     autoCreateApiToSql: true,
     autoCreateMenuToSql: true,
-    autoMoveFile: true,
+    autoMigrate: true,
     gvaModel: true,
     autoCreateResource: false,
     fields: []

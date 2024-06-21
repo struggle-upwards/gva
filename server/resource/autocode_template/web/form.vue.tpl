@@ -116,7 +116,11 @@ const formData = ref({
             {{.FieldJson}}: '',
             {{- end }}
             {{- if eq .FieldType "int" }}
+<<<<<<< HEAD
             {{.FieldJson}}: {{- if .DictType }} undefined{{ else }} 0{{- end }},
+=======
+            {{.FieldJson}}: {{- if or .DictType .DataSource }} undefined{{ else }} 0{{- end }},
+>>>>>>> upstream/main
             {{- end }}
             {{- if eq .FieldType "time.Time" }}
             {{.FieldJson}}: new Date(),
@@ -176,7 +180,11 @@ const init = async () => {
     if (route.query.id) {
       const res = await find{{.StructName}}({ ID: route.query.id })
       if (res.code === 0) {
+<<<<<<< HEAD
         formData.value = res.data.re{{.Abbreviation}}
+=======
+        formData.value = res.data
+>>>>>>> upstream/main
         type.value = 'update'
       }
     } else {

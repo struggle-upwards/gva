@@ -27,11 +27,13 @@ func (z *ZapCore) WriteSyncer(formats ...string) zapcore.WriteSyncer {
 	cutter := NewCutter(
 		global.GVA_CONFIG.Zap.Director,
 		z.level.String(),
+		global.GVA_CONFIG.Zap.RetentionDay,
 		CutterWithLayout(time.DateOnly),
 		CutterWithFormats(formats...),
 	)
 	if global.GVA_CONFIG.Zap.LogInConsole {
-		return zapcore.AddSync(os.Stdout)
+		multiSyncer := zapcore.NewMultiWriteSyncer(os.Stdout, cutter)
+		return zapcore.AddSync(multiSyncer)
 	}
 	return zapcore.AddSync(cutter)
 }

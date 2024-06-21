@@ -17,7 +17,11 @@
       <el-date-picker v-model="searchInfo.endCreatedAt" type="datetime" placeholder="结束日期" :disabled-date="time=> searchInfo.startCreatedAt ? time.getTime() < searchInfo.startCreatedAt.getTime() : false"></el-date-picker>
       </el-form-item>
       {{ end -}}
+<<<<<<< HEAD
            {{- range .Fields}}  {{- if .FieldSearchType}} {{- if eq .FieldType "bool" }}
+=======
+           {{- range .Fields}}  {{- if .FieldSearchType}} {{- if not .FieldSearchHide }} {{- if eq .FieldType "bool" }}
+>>>>>>> upstream/main
             <el-form-item label="{{.FieldDesc}}" prop="{{.FieldJson}}">
             <el-select v-model="searchInfo.{{.FieldJson}}" clearable placeholder="请选择">
                 <el-option
@@ -74,10 +78,83 @@
          <el-input v-model="searchInfo.{{.FieldJson}}" placeholder="搜索条件" />
         {{- end}}
 
+<<<<<<< HEAD
         </el-form-item>{{ end }}{{ end }}{{ end }}
         <el-form-item>
           <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
           <el-button icon="refresh" @click="onReset">重置</el-button>
+=======
+        </el-form-item>{{ end }}{{ end }}{{ end }}{{ end }}
+
+        <template v-if="showAllQuery">
+          <!-- 将需要控制显示状态的查询条件添加到此范围内 -->
+          {{- range .Fields}}  {{- if .FieldSearchType}} {{- if .FieldSearchHide }} {{- if eq .FieldType "bool" }}
+          <el-form-item label="{{.FieldDesc}}" prop="{{.FieldJson}}">
+                      <el-select v-model="searchInfo.{{.FieldJson}}" clearable placeholder="请选择">
+                          <el-option
+                              key="true"
+                              label="是"
+                              value="true">
+                          </el-option>
+                          <el-option
+                              key="false"
+                              label="否"
+                              value="false">
+                          </el-option>
+                      </el-select>
+                      </el-form-item>
+                     {{- else if .DictType}}
+                     <el-form-item label="{{.FieldDesc}}" prop="{{.FieldJson}}">
+                      <el-select v-model="searchInfo.{{.FieldJson}}" clearable placeholder="请选择" @clear="()=>{searchInfo.{{.FieldJson}}=undefined}">
+                        <el-option v-for="(item,key) in {{ .DictType }}Options" :key="key" :label="item.label" :value="item.value" />
+                      </el-select>
+                      </el-form-item>
+                      {{- else}}
+                  <el-form-item label="{{.FieldDesc}}" prop="{{.FieldJson}}">
+                  {{- if eq .FieldType "float64" "int"}}
+                      {{if eq .FieldSearchType "BETWEEN" "NOT BETWEEN"}}
+                      <el-input v-model.number="searchInfo.start{{.FieldName}}" placeholder="最小值" />
+                      —
+                      <el-input v-model.number="searchInfo.end{{.FieldName}}" placeholder="最大值" />
+                     {{- else}}
+                       {{- if .DictType}}
+                        <el-select v-model="searchInfo.{{.FieldJson}}" placeholder="请选择" style="width:100%" :clearable="true" >
+                         <el-option v-for="(item,key) in {{ .DictType }}Options" :key="key" :label="item.label" :value="item.value" />
+                       </el-select>
+                              {{- else}}
+                       <el-input v-model.number="searchInfo.{{.FieldJson}}" placeholder="搜索条件" />
+                              {{- end }}
+                    {{- end}}
+                  {{- else if eq .FieldType "time.Time"}}
+                      {{if eq .FieldSearchType "BETWEEN" "NOT BETWEEN"}}
+                      <template #label>
+                      <span>
+                        {{.FieldDesc}}
+                        <el-tooltip content="搜索范围是开始日期（包含）至结束日期（不包含）">
+                          <el-icon><QuestionFilled /></el-icon>
+                        </el-tooltip>
+                      </span>
+                    </template>
+                      <el-date-picker v-model="searchInfo.start{{.FieldName}}" type="datetime" placeholder="开始日期" :disabled-date="time=> searchInfo.end{{.FieldName}} ? time.getTime() > searchInfo.end{{.FieldName}}.getTime() : false"></el-date-picker>
+                      —
+                      <el-date-picker v-model="searchInfo.end{{.FieldName}}" type="datetime" placeholder="结束日期" :disabled-date="time=> searchInfo.start{{.FieldName}} ? time.getTime() < searchInfo.start{{.FieldName}}.getTime() : false"></el-date-picker>
+                     {{- else}}
+                     <el-date-picker v-model="searchInfo.{{.FieldJson}}" type="datetime" placeholder="搜索条件"></el-date-picker>
+                    {{- end}}
+                  {{- else}}
+                   <el-input v-model="searchInfo.{{.FieldJson}}" placeholder="搜索条件" />
+                  {{- end}}
+
+                  </el-form-item>
+          {{ end }}{{ end }}{{ end }}{{ end }}
+        </template>
+
+        <el-form-item>
+          <el-button type="primary" icon="search" @click="onSubmit">查询</el-button>
+          <el-button icon="refresh" @click="onReset">重置</el-button>
+          <el-button link type="primary" icon="arrow-down" @click="showAllQuery=true" v-if="!showAllQuery">展开</el-button>
+          <el-button link type="primary" icon="arrow-up" @click="showAllQuery=false" v-else>收起</el-button>
+>>>>>>> upstream/main
         </el-form-item>
       </el-form>
     </div>
@@ -99,7 +176,11 @@
         >
         <el-table-column type="selection" width="55" />
         {{ if .GvaModel }}
+<<<<<<< HEAD
         <el-table-column align="left" label="日期" width="180">
+=======
+        <el-table-column align="left" label="日期" prop="createdAt" width="180">
+>>>>>>> upstream/main
             <template #default="scope">{{ "{{ formatDate(scope.row.CreatedAt) }}" }}</template>
         </el-table-column>
         {{ end }}
@@ -127,17 +208,29 @@
             <template #default="scope">{{"{{"}} formatBoolean(scope.row.{{.FieldJson}}) {{"}}"}}</template>
         </el-table-column>
          {{- else if eq .FieldType "time.Time" }}
+<<<<<<< HEAD
          <el-table-column {{- if .Sort}} sortable{{- end}} align="left" label="{{.FieldDesc}}" width="180">
             <template #default="scope">{{"{{"}} formatDate(scope.row.{{.FieldJson}}) {{"}}"}}</template>
          </el-table-column>
           {{- else if eq .FieldType "picture" }}
           <el-table-column label="{{.FieldDesc}}" width="200">
+=======
+         <el-table-column {{- if .Sort}} sortable{{- end}} align="left" label="{{.FieldDesc}}" prop="{{.FieldJson}}" width="180">
+            <template #default="scope">{{"{{"}} formatDate(scope.row.{{.FieldJson}}) {{"}}"}}</template>
+         </el-table-column>
+          {{- else if eq .FieldType "picture" }}
+          <el-table-column label="{{.FieldDesc}}" prop="{{.FieldJson}}" width="200">
+>>>>>>> upstream/main
               <template #default="scope">
                 <el-image style="width: 100px; height: 100px" :src="getUrl(scope.row.{{.FieldJson}})" fit="cover"/>
               </template>
           </el-table-column>
            {{- else if eq .FieldType "pictures" }}
+<<<<<<< HEAD
            <el-table-column label="{{.FieldDesc}}" width="200">
+=======
+           <el-table-column label="{{.FieldDesc}}" prop="{{.FieldJson}}" width="200">
+>>>>>>> upstream/main
               <template #default="scope">
                  <div class="multiple-img-box">
                     <el-image v-for="(item,index) in scope.row.{{.FieldJson}}" :key="index" style="width: 80px; height: 80px" :src="getUrl(item)" fit="cover"/>
@@ -145,7 +238,11 @@
               </template>
            </el-table-column>
            {{- else if eq .FieldType "video" }}
+<<<<<<< HEAD
            <el-table-column label="{{.FieldDesc}}" width="200">
+=======
+           <el-table-column label="{{.FieldDesc}}" prop="{{.FieldJson}}" width="200">
+>>>>>>> upstream/main
               <template #default="scope">
                <video
                   style="width: 100px; height: 100px"
@@ -157,13 +254,21 @@
               </template>
            </el-table-column>
            {{- else if eq .FieldType "richtext" }}
+<<<<<<< HEAD
                       <el-table-column label="{{.FieldDesc}}" width="200">
+=======
+                      <el-table-column label="{{.FieldDesc}}" prop="{{.FieldJson}}" width="200">
+>>>>>>> upstream/main
                          <template #default="scope">
                             [富文本内容]
                          </template>
                       </el-table-column>
            {{- else if eq .FieldType "file" }}
+<<<<<<< HEAD
                     <el-table-column label="{{.FieldDesc}}" width="200">
+=======
+                    <el-table-column label="{{.FieldDesc}}" prop="{{.FieldJson}}" width="200">
+>>>>>>> upstream/main
                         <template #default="scope">
                              <div class="file-list">
                                <el-tag v-for="file in scope.row.{{.FieldJson}}" :key="file.uid">{{"{{"}}file.name{{"}}"}}</el-tag>
@@ -171,7 +276,11 @@
                         </template>
                     </el-table-column>
          {{- else if eq .FieldType "json" }}
+<<<<<<< HEAD
           <el-table-column label="{{.FieldDesc}}" width="200">
+=======
+          <el-table-column label="{{.FieldDesc}}" prop="{{.FieldJson}}" width="200">
+>>>>>>> upstream/main
               <template #default="scope">
                   [JSON]
               </template>
@@ -327,6 +436,12 @@ defineOptions({
     name: '{{.StructName}}'
 })
 
+<<<<<<< HEAD
+=======
+// 控制更多查询条件显示/隐藏状态
+const showAllQuery = ref(false)
+
+>>>>>>> upstream/main
 // 自动化生成的字典（可能为空）以及字段
     {{- range $index, $element := .DictTypes}}
 const {{ $element }}Options = ref([])
@@ -343,7 +458,11 @@ const formData = ref({
         {{.FieldJson}}: '',
         {{- end }}
         {{- if eq .FieldType "int" }}
+<<<<<<< HEAD
         {{.FieldJson}}: {{- if .DictType }} undefined{{ else }} 0{{- end }},
+=======
+        {{.FieldJson}}: {{- if or .DictType .DataSource}} undefined{{ else }} 0{{- end }},
+>>>>>>> upstream/main
         {{- end }}
         {{- if eq .FieldType "time.Time" }}
         {{.FieldJson}}: new Date(),
@@ -590,7 +709,11 @@ const update{{.StructName}}Func = async(row) => {
     const res = await find{{.StructName}}({ {{.PrimaryField.FieldJson}}: row.{{.PrimaryField.FieldJson}} })
     type.value = 'update'
     if (res.code === 0) {
+<<<<<<< HEAD
         formData.value = res.data.re{{.Abbreviation}}
+=======
+        formData.value = res.data
+>>>>>>> upstream/main
         dialogFormVisible.value = true
     }
 }
@@ -635,7 +758,11 @@ const closeDialog = () => {
         {{.FieldJson}}: '',
         {{- end }}
         {{- if eq .FieldType "int" }}
+<<<<<<< HEAD
         {{.FieldJson}}: {{- if .DictType }} undefined{{ else }} 0{{- end }},
+=======
+        {{.FieldJson}}: {{- if or .DictType .DataSource }} undefined{{ else }} 0{{- end }},
+>>>>>>> upstream/main
         {{- end }}
         {{- if eq .FieldType "time.Time" }}
         {{.FieldJson}}: new Date(),
